@@ -1,0 +1,61 @@
+version: '3.8'
+services:
+  ollama:
+    image: docker.io/ollama/ollama:0.33.3
+    container_name: ollama
+    ports:
+      - "51434:11434"
+    environment:
+      - OLLAMA_ORIGINS=*             # allows the UI (browser) to connect to the Ollama API
+      - OLLAMA_MAX_LOADED_MODELS=1   # keep only one model in memory at a time
+      - OLLAMA_KEEP_ALIVE=5m         # unload the model after 5 min of inactivity
+      - OLLAMA_NUM_THREADS=2         # how many CPU threads Ollama itself may use
+    mem_limit: 2g                    # hard RAM limit for the container
+    mem_reservation: 1g              # "soft" threshold Docker will aim for
+    cpus: 1.0                        # hard CPU limit for the container (2 cores)
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+
+  ollama-model-pull:
+    image: docker.io/curlimages/curl:8.11.1
+    container_name: ollama_model_pull
+    depends_on:
+      - ollama
+    entrypoint: >
+      sh -c "
+      echo 'Waiting for Ollama to start...';
+      until curl -s http://ollama:11434/api/tags > /dev/null; do sleep 2; done;
+      echo 'Downloading model...';
+      curl -X POST http://ollama:11434/api/pull -d '{\"name\": \"llama3.2:1b\"}';
+      echo 'Model downloaded successfully!';
+      "
+
+  ollama-ui:
+    image: docker.io/nginx:alpine
+    container_name: ollama_ui
+    depends_on:
+      - ollama
+    ports:
+      - "51480:80"
+    volumes:
+      - ./ollama-ui/index.html:/usr/share/nginx/html/index.html:ro
+    restart: unless-stopped
+
+  ollama-exporter:
+    image: docker.io/lucabecker42/ollama-exporter:1.0.1
+    container_name: ollama_exporter
+    depends_on:
+      - ollama
+    environment:
+      - PORT=8000
+      - INTERVAL=30
+      - OLLAMA_HOST=ollama:11434
+      - API_TIMEOUT=30
+      - LOG_LEVEL=INFO
+    ports:
+      - "51500:8000"   # /metrics and /health
+    restart: unless-stopped
+
+volumes:
+  ollama_data:

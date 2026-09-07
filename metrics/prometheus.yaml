@@ -1,0 +1,19 @@
+# Standalone Prometheus scrape configuration for an EXTERNAL Prometheus instance
+# (i.e. Prometheus running outside this docker-compose stack / network).
+#
+# Point your Prometheus at this file, or merge the scrape_configs entry
+# into your existing prometheus.yml.
+#
+# Replace "localhost" below with the actual hostname or IP of the machine
+# running the ollama-compose stack, if Prometheus runs on a different host.
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # Ollama usage metrics (requests, tokens/sec, loaded models, VRAM)
+  # exposed by the ollama-exporter container via its published host port.
+  - job_name: 'ollama-exporter'
+    static_configs:
+      - targets: ['localhost:51500']

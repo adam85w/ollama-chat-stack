@@ -1,0 +1,137 @@
+{
+  "title": "Ollama Overview",
+  "uid": "ollama-overview",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "time": { "from": "now-6h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Ollama Server Status",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "targets": [
+        { "expr": "ollama_up", "legendFormat": "up" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Ollama Version",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "targets": [
+        { "expr": "ollama_version_info", "legendFormat": "{{version}}", "format": "table", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "mappings": [] } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "textMode": "name" }
+    },
+    {
+      "id": 3,
+      "title": "Total Models Available",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "targets": [
+        { "expr": "ollama_models_total", "legendFormat": "models" }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Currently Loaded Models",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "targets": [
+        { "expr": "count(ollama_running_models)", "legendFormat": "loaded" }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Loaded Model Memory Usage",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "fieldConfig": { "defaults": { "unit": "bytes" } },
+      "targets": [
+        { "expr": "ollama_model_memory_bytes", "legendFormat": "{{model_name}}" }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Model Sizes on Disk",
+      "type": "bargauge",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "fieldConfig": { "defaults": { "unit": "bytes" } },
+      "targets": [
+        { "expr": "ollama_model_size_bytes", "legendFormat": "{{model_name}}", "instant": true }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Running Models (by name)",
+      "type": "table",
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 12 },
+      "targets": [
+        { "expr": "ollama_running_models", "format": "table", "instant": true }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Model Info (family / quantization)",
+      "type": "table",
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 12 },
+      "targets": [
+        { "expr": "ollama_model_info", "format": "table", "instant": true }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Exporter Scrape Duration (avg)",
+      "type": "timeseries",
+      "gridPos": { "h": 7, "w": 8, "x": 0, "y": 18 },
+      "fieldConfig": { "defaults": { "unit": "s" } },
+      "targets": [
+        {
+          "expr": "rate(ollama_exporter_scrape_duration_seconds_sum[5m]) / rate(ollama_exporter_scrape_duration_seconds_count[5m])",
+          "legendFormat": "{{operation}}"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "title": "Scrape Success Rate",
+      "type": "timeseries",
+      "gridPos": { "h": 7, "w": 8, "x": 8, "y": 18 },
+      "fieldConfig": { "defaults": { "unit": "reqps" } },
+      "targets": [
+        { "expr": "rate(ollama_exporter_scrapes_total[5m])", "legendFormat": "{{status}}" }
+      ]
+    },
+    {
+      "id": 11,
+      "title": "Time Since Last Successful Scrape",
+      "type": "stat",
+      "gridPos": { "h": 7, "w": 8, "x": 16, "y": 18 },
+      "fieldConfig": { "defaults": { "unit": "s" } },
+      "targets": [
+        { "expr": "time() - ollama_exporter_last_scrape_timestamp_seconds", "legendFormat": "seconds ago" }
+      ]
+    },
+    {
+      "id": 12,
+      "title": "Exporter Build Info",
+      "type": "table",
+      "gridPos": { "h": 4, "w": 24, "x": 0, "y": 25 },
+      "targets": [
+        { "expr": "ollama_exporter_build_info", "format": "table", "instant": true }
+      ]
+    }
+  ]
+}
