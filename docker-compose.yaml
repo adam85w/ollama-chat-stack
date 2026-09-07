@@ -12,7 +12,7 @@ services:
       - OLLAMA_NUM_THREADS=2         # how many CPU threads Ollama itself may use
     mem_limit: 2g                    # hard RAM limit for the container
     mem_reservation: 1g              # "soft" threshold Docker will aim for
-    cpus: 1.0                        # hard CPU limit for the container (2 cores)
+    cpus: 2.0                        # hard CPU limit for the container (2 cores)
     volumes:
       - ollama_data:/root/.ollama
     restart: unless-stopped
