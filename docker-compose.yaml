@@ -8,11 +8,10 @@ services:
     environment:
       - OLLAMA_ORIGINS=*             # allows the UI (browser) to connect to the Ollama API
       - OLLAMA_MAX_LOADED_MODELS=1   # keep only one model in memory at a time
-      - OLLAMA_KEEP_ALIVE=5m         # unload the model after 5 min of inactivity
-      - OLLAMA_NUM_THREADS=2         # how many CPU threads Ollama itself may use
-    mem_limit: 2g                    # hard RAM limit for the container
-    mem_reservation: 1g              # "soft" threshold Docker will aim for
-    cpus: 2.0                        # hard CPU limit for the container (2 cores)
+      - OLLAMA_KEEP_ALIVE=30m        # unload the model after 30 min of inactivity
+    mem_limit: 4g                    # hard RAM limit for the container
+    mem_reservation: 2g              # "soft" threshold Docker will aim for
+    cpus: 1.0                        # hard CPU limit for the container (1 core); keep NUM_THREADS in the UI equal to this
     volumes:
       - ollama_data:/root/.ollama
     restart: unless-stopped
@@ -22,13 +21,17 @@ services:
     container_name: ollama_model_pull
     depends_on:
       - ollama
+    volumes:
+      - ./ollama-model/bielik-chatml.json:/config/bielik-chatml.json:ro
     entrypoint: >
       sh -c "
       echo 'Waiting for Ollama to start...';
       until curl -s http://ollama:11434/api/tags > /dev/null; do sleep 2; done;
       echo 'Downloading model...';
-      curl -X POST http://ollama:11434/api/pull -d '{\"name\": \"llama3.2:1b\"}';
-      echo 'Model downloaded successfully!';
+      curl -X POST http://ollama:11434/api/pull -d '{\"name\": \"SpeakLeash/bielik-1.5b-v3.0-instruct:Q8_0\"}';
+      echo 'Creating bielik-1.5b-chatml (the published template does not match this model)...';
+      curl -sS --fail -X POST http://ollama:11434/api/create -d @/config/bielik-chatml.json;
+      echo 'Model ready!';
       "
 
   ollama-ui:

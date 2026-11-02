@@ -1,0 +1,10 @@
+{
+  "model": "bielik-1.5b-chatml",
+  "from": "SpeakLeash/bielik-1.5b-v3.0-instruct:Q8_0",
+  "template": "{{- if .System }}<|im_start|>system\n{{ .System }}<|im_end|>\n{{ end }}{{- range .Messages }}<|im_start|>{{ .Role }}\n{{ .Content }}<|im_end|>\n{{ end }}<|im_start|>assistant\n",
+  "parameters": {
+    "stop": ["<|im_end|>", "<|im_start|>"],
+    "temperature": 0.1
+  },
+  "stream": false
+}
